@@ -22,6 +22,10 @@ def create_app():
     # configure the login manager
     login_manager.init_app(app)
 
+    login_manager.login_view = 'login'
+    login_manager.needs_refresh_message = (u"To protect your account, please re-authenticate to access this page.")
+    login_manager.needs_refresh_message_category = "info"
+
     @login_manager.user_loader
     def load_user(email):
         return User.query.filter_by(email=email).first()

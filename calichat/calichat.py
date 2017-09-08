@@ -38,6 +38,12 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/chat')
+@login_required
+def chat():
+    return 'chat'
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
@@ -57,18 +63,10 @@ def signup():
             return "Form didn't validate"
 
 
-@app.route('/protected')
-@login_required
-def protected():
-    return "protected area"
-
-
 @app.route('/login', methods=['GET','POST'])
 def login():
     form = SignupForm()
-    if request.method == 'GET':
-        return render_template('login.html', form=form)
-    elif request.method == 'POST':
+    if request.method == 'POST':
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
             if user:
@@ -81,6 +79,7 @@ def login():
                 return "user doesn't exist"
         else:
             return "form not validated"
+    return render_template('login.html', form=form)
 
 
 @app.route("/logout")
