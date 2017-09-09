@@ -1,16 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Calichat Sign-up</title>
-</head>
-<body>
-    <h1>Sign-up</h1>
-    <form method="POST" action="/signup">
-        {{ form.hidden_tag() }}
-        {{ form.email.label }} {{ form.email(size=20) }}
-        {{ form.password.label }} {{ form.password(size=20) }}
-        <input type="submit" value="Signup">
-    </form>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block titlehead %}Sign Up{% endblock %}
+
+{% block head%}{% endblock %}
+
+{% block body %}
+
+<h1>Sign-up</h1>
+<form method="POST" action="{{ url_for('signup') }}?next={{ url_for('index') }}">
+    {{ form.hidden_tag() }}
+    {{ form.email.label }} {{ form.email(size=20) }}
+    {{ form.password.label }} {{ form.password(size=20) }}
+    <input type="submit" value="Signup">
+</form>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Calichat {% block titlehead %}{% endblock %}</title>
+    {% block head%}{% endblock %}
+</head>
+<body>
+	{% if current_user.is_authenticated %}
+	  Logged in as {{ current_user.email }}. <a href="{{ url_for('logout') }}">Logout</a>
+	{% else %}
+	  <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('signup') }}">Sign Up</a>
+	{% endif %}
+
+	{% with messages = get_flashed_messages(with_categories=true) %}
+	  {% if messages %}
+	    <ul class=flashes>
+	    {% for category, message in messages %}
+	      <li class="{{ category }}">{{ message }}</li>
+	    {% endfor %}
+	    </ul>
+	  {% endif %}
+	{% endwith %}
+    {% block body %}{% endblock %}
+</body>
+</html>

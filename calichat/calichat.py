@@ -4,6 +4,9 @@ from threading import Lock
 from flask import (
     render_template,
     request,
+    flash,
+    redirect,
+    url_for,
 )
 from flask_login import (
     login_user,
@@ -47,20 +50,20 @@ def chat():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
-    if request.method == 'GET':
-        return render_template('signup.html', form=form)
-    elif request.method == 'POST':
+    if request.method == 'POST':
         if form.validate_on_submit():
             if User.query.filter_by(email=form.email.data).first():
-                return "Email address already exists"
+                flash("Email address already exists", 'error')
             else:
                 newuser = User(form.email.data, form.password.data)
                 db.session.add(newuser)
                 db.session.commit()
                 login_user(newuser)
-                return "User created!!!"
+                flash("User created!", 'success')
+                return redirect(request.args.get('next'), url_for('index'))
         else:
-            return "Form didn't validate"
+            flash("Please enter valid data.", 'error')
+    return render_template('signup.html', form=form)
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -69,16 +72,17 @@ def login():
     if request.method == 'POST':
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            if user:
+            if not user:
                 if user.password == form.password.data:
                     login_user(user)
-                    return "User logged in"
+                    flash("User logged in", 'success')
+                    return redirect(request.args.get('next'), url_for('index'))
                 else:
-                    return "Wrong password"
+                    flash("Wrong password", 'error')
             else:
-                return "user doesn't exist"
+                flash("User doesn't exist", 'error')
         else:
-            return "form not validated"
+            flash("Please enter valid data.", 'error')
     return render_template('login.html', form=form)
 
 
@@ -86,4 +90,5 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return "Logged out"
+    flash("Logged out", 'success')
+    return redirect(url_for('index'))
