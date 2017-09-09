@@ -12,6 +12,7 @@ from flask_login import (
     login_user,
     login_required,
     logout_user,
+    current_user,
 )
 from flask_socketio import (
     SocketIO,
@@ -23,11 +24,12 @@ from flask_socketio import (
     rooms,
     disconnect,
 )
+from sqlalchemy.sql import collate
 
 from calichat.app import create_app
 from calichat.extensions import db
-from calichat.forms import SignupForm
-from calichat.models import User
+from calichat.forms import SignupForm, RoomForm
+from calichat.models import User, Room
 
 app = create_app()
 
@@ -38,13 +40,28 @@ thread_lock = Lock()
 
 @app.route('/')
 def index():
+    """Index page."""
+    if current_user.is_authenticated:
+        return redirect(url_for('rooms'))
     return render_template('index.html')
 
 
-@app.route('/chat')
+@app.route('/rooms', methods=['GET', 'POST'])
 @login_required
-def chat():
-    return 'chat'
+def rooms():
+    """Lists rooms and allows to create new ones"""
+    form = RoomForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            if Room.query.filter_by(title=form.title.data).first():
+                flash("Room with same name already exists", 'error')
+            else:
+                new_room = Room(title=form.title.data)
+                db.session.add(new_room)
+                db.session.commit()
+                return redirect(url_for('rooms'))
+    chat_rooms = Room.query.order_by(collate(Room.title, 'NOCASE')).all()
+    return render_template('rooms.html', form=form, chat_rooms=chat_rooms)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -55,12 +72,12 @@ def signup():
             if User.query.filter_by(email=form.email.data).first():
                 flash("Email address already exists", 'error')
             else:
-                newuser = User(email=form.email.data, password=form.password.data)
-                db.session.add(newuser)
+                new_user = User(email=form.email.data, password=form.password.data)
+                db.session.add(new_user)
                 db.session.commit()
-                login_user(newuser)
+                login_user(new_user)
                 flash("User created!", 'success')
-                return redirect(request.args.get('next') or url_for('index'))
+                return redirect(request.args.get('next') or url_for('rooms'))
         else:
             flash("Please enter valid data.", 'error')
     return render_template('signup.html', form=form)
@@ -76,7 +93,7 @@ def login():
                 if user.is_correct_password(form.password.data):
                     login_user(user)
                     flash("User logged in", 'success')
-                    return redirect(request.args.get('next') or url_for('index'))
+                    return redirect(request.args.get('next') or url_for('rooms'))
                 else:
                     flash("Wrong password", 'error')
             else:

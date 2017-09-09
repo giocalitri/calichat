@@ -43,7 +43,7 @@ class User(db.Model, UserMixin):
 class Room(db.Model):
     """Model for chat rooms"""
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(120))
+    title = db.Column(db.String(120), unique=True)
 
 
 class Message(db.Model):

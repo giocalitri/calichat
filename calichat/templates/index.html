@@ -6,6 +6,12 @@
 
 {% block body %}
 
-<h1>This is the index</h1>
+<h1>Welcome to calichat</h1>
+
+{% if not current_user.is_authenticated %}
+  <span class="login_warning">Please <a href="{{ url_for('login') }}">Login</a>
+  or <a href="{{ url_for('signup') }}">Sign Up</a> before proceeding.
+  </span>
+{% endif %}
 
 {% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block titlehead %}Rooms{% endblock %}
+
+{% block head%}{% endblock %}
+
+{% block body %}
+
+	{% if chat_rooms %}
+		<h3 class="chat-room-title">Available chat rooms:</h3>
+		<ul class="chat-room-list">
+			{% for chat_room in chat_rooms %}
+				<li><a href="">{{ chat_room.title }}</a></li>
+			{% endfor %}
+		 </ul>
+	{% else %}
+		<h3 class="chat-room-title">Please create a chat room first</h3>
+	{% endif %}
+	<form method="POST" action="{{ url_for('rooms') }}">
+	    {{ form.hidden_tag() }}
+	    {{ form.title(size=50) }}
+	   	{{ form.submit }}
+	</form>
+
+{% endblock %}
