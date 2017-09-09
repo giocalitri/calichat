@@ -46,7 +46,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/rooms', methods=['GET', 'POST'])
+@app.route('/room', methods=['GET', 'POST'])
 @login_required
 def rooms():
     """Lists rooms and allows to create new ones"""
@@ -64,8 +64,19 @@ def rooms():
     return render_template('rooms.html', form=form, chat_rooms=chat_rooms)
 
 
+@app.route('/room/<int:room_id>/')
+@login_required
+def room(room_id):
+    """
+    The room where the chat happens
+    """
+    room = Room.query.filter_by(id=room_id).first_or_404()
+    return render_template('room_with_chat.html', chat_room=room)
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    """Takes care of creating new users"""
     form = SignupForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -85,6 +96,7 @@ def signup():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
+    """Takes car of logging in the user"""
     form = SignupForm()
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -106,6 +118,7 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
+    """Takes care of logging out the user"""
     logout_user()
     flash("Logged out", 'success')
     return redirect(url_for('index'))

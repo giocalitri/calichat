@@ -10,7 +10,7 @@
 		<h3 class="chat-room-title">Available chat rooms:</h3>
 		<ul class="chat-room-list">
 			{% for chat_room in chat_rooms %}
-				<li><a href="">{{ chat_room.title }}</a></li>
+				<li><a href="{{ url_for('room', room_id=chat_room.id) }}">{{ chat_room.title }}</a></li>
 			{% endfor %}
 		 </ul>
 	{% else %}
