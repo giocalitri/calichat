@@ -46,7 +46,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/room', methods=['GET', 'POST'])
+@app.route('/room/', methods=['GET', 'POST'])
 @login_required
 def rooms():
     """Lists rooms and allows to create new ones"""
