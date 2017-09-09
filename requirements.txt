@@ -1,4 +1,5 @@
 flask
+flask_bcrypt
 flask-login
 flask-socketio
 flask-sqlalchemy

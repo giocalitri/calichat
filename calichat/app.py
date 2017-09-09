@@ -5,7 +5,11 @@ defines the base app and the configuration
 from flask import Flask
 
 from calichat.config import Config
-from calichat.extensions import db, login_manager
+from calichat.extensions import (
+    db,
+    login_manager,
+    bcrypt,
+)
 from calichat.models import User
 
 
@@ -29,5 +33,8 @@ def create_app():
     @login_manager.user_loader
     def load_user(email):
         return User.query.filter_by(email=email).first()
+
+    # configure bcrypt
+    bcrypt.init_app(app)
 
     return app

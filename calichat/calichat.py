@@ -55,12 +55,12 @@ def signup():
             if User.query.filter_by(email=form.email.data).first():
                 flash("Email address already exists", 'error')
             else:
-                newuser = User(form.email.data, form.password.data)
+                newuser = User(email=form.email.data, password=form.password.data)
                 db.session.add(newuser)
                 db.session.commit()
                 login_user(newuser)
                 flash("User created!", 'success')
-                return redirect(request.args.get('next'), url_for('index'))
+                return redirect(request.args.get('next') or url_for('index'))
         else:
             flash("Please enter valid data.", 'error')
     return render_template('signup.html', form=form)
@@ -72,11 +72,11 @@ def login():
     if request.method == 'POST':
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            if not user:
-                if user.password == form.password.data:
+            if user:
+                if user.is_correct_password(form.password.data):
                     login_user(user)
                     flash("User logged in", 'success')
-                    return redirect(request.args.get('next'), url_for('index'))
+                    return redirect(request.args.get('next') or url_for('index'))
                 else:
                     flash("Wrong password", 'error')
             else:
