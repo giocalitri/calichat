@@ -1,4 +1,6 @@
 """Models"""
+import uuid
+
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import UUIDType
@@ -23,7 +25,7 @@ class User(db.Model, UserMixin):
         self._password = bcrypt.generate_password_hash(plaintext)
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.email
 
     def get_id(self):
         """
@@ -51,7 +53,7 @@ class Message(db.Model):
     NOTE: using a UUID4 as primary key to avoid risks of running out of integers.
     A UUID4 has a risk of collition of 1/(2^64 * 16)
     """
-    uuid = db.Column(UUIDType, primary_key=True)
+    uuid = db.Column(UUIDType, primary_key=True, default=uuid.uuid4)
     message = db.Column(db.Text)
     timestamp = db.Column(db.DateTime)
     room_id = db.Column(db.Integer, db.ForeignKey('room.id', ondelete='CASCADE'))
