@@ -133,10 +133,10 @@ class ChatNamespace(Namespace):
     def on_disconnect(self):
         emit('chat_response', {'data': 'Disconnected'})
 
-    def on_my_event(self, message_json):
+    def on_echo_event(self, message_json):
         emit('chat_response', {'data': message_json['data']})
 
-    def on_my_broadcast_event(self, message_json):
+    def on_broadcast_event(self, message_json):
         emit('chat_response', {'data': message_json['data']}, broadcast=True)
 
     def on_room_event(self, message_json):
@@ -149,9 +149,7 @@ class ChatNamespace(Namespace):
 
     def on_leave(self, message):
         leave_room(message['room'])
-        emit('chat_response',
-             {'data': 'In rooms: ' + ', '.join(rooms()),
-              'count': session['receive_count']})
+        emit('chat_response', {'data': 'In rooms: ' + ', '.join(rooms())})
 
 
-socketio.on_namespace(ChatNamespace('/chat'))
+socketio.on_namespace(ChatNamespace(app.config['SOCKET_NAMESPACE']))

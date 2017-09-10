@@ -21,3 +21,4 @@ class Config:
         'DATABASE_URL', 'sqlite:///{}'.format(os.path.join(BASE_DIR, 'calichat.db')))
     CSRF_ENABLED = get_bool('CSRF_ENABLED', True)
     BCRYPT_LOG_ROUNDS = get_int('BCRYPT_LOG_ROUNDS', 12)
+    SOCKET_NAMESPACE = '/chat'
