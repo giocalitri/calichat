@@ -1,4 +1,5 @@
 """The actual app"""
+from functools import wraps
 from threading import Lock
 
 from flask import (
@@ -124,32 +125,61 @@ def logout():
     return redirect(url_for('index'))
 
 
+def login_required_socket(f):
+    """Custom decorator to be used on websockets definitions"""
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            disconnect()
+        else:
+            return f(*args, **kwargs)
+    return wrapped
+
+
 class ChatNamespace(Namespace):
     """Socketio definitions"""
 
     def on_connect(self):
-        emit('chat_response', {'data': 'Connected'})
+        """Handler for connection"""
+        emit(
+            'chat_response',
+            {
+                'content': 'You are connected, {}'.format(current_user.email),
+                'sender': 'system',
+                'message_type': 'notification'
+            }
+        )
 
     def on_disconnect(self):
-        emit('chat_response', {'data': 'Disconnected'})
+        """Handler for disconnection"""
+        emit('chat_response', {'content': 'Disconnected'})
 
+    @login_required_socket
     def on_echo_event(self, message_json):
-        emit('chat_response', {'data': message_json['data']})
+        """Handler to echo messages"""
+        emit('chat_response', {'content': message_json['content']})
 
+    @login_required_socket
     def on_broadcast_event(self, message_json):
-        emit('chat_response', {'data': message_json['data']}, broadcast=True)
+        """Handler to send broadcast messages"""
+        emit('chat_response', {'content': message_json['content']}, broadcast=True)
 
+    @login_required_socket
     def on_room_event(self, message_json):
-        emit('chat_response', {'data': message_json['data']}, room=message_json['room'])
+        """Handler to send a message in a room"""
+        emit('chat_response', {'content': message_json['content']}, room=message_json['room'])
 
+    @login_required_socket
     def on_join(self, message_json):
         """Handler to join a room"""
         join_room(message_json['room'])
-        emit('chat_response', {'data': 'In rooms: ' + ', '.join(rooms())})
+        emit('chat_response', {'content': 'In rooms: ' + ', '.join(rooms())})
 
+    @login_required_socket
     def on_leave(self, message):
+        """Handler to leave a room"""
         leave_room(message['room'])
-        emit('chat_response', {'data': 'In rooms: ' + ', '.join(rooms())})
+        emit('chat_response', {'content': 'In rooms: ' + ', '.join(rooms())})
 
 
 socketio.on_namespace(ChatNamespace(app.config['SOCKET_NAMESPACE']))

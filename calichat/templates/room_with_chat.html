@@ -10,17 +10,22 @@
 
 			let socket = io.connect(SERVER_URL);
 
+			// enable the chat when connect event is received
 			socket.on('connect', function() {
-		        socket.emit('echo_event', {data: 'I\'m connected!'});
+				$('#chat_room_submit').prop( "disabled", false );
+				// join the char room
 		    });
 
-			// this is the event handler that takes care of all the messages received from the server
+			// event handler that takes care of all the messages received from the server
 			socket.on('chat_response', function(msgJson) {
-		        $('#chat_content').append($('<div/>').text(msgJson.data).html() + '<br/>');
+		        $('#chat_content').append($('<div/>').text(msgJson.content).html() + '<br/>');
 		    });
 
-			$('form#broadcast').submit(function(event) {
-		        socket.emit('broadcast_event', {data: $('#broadcast_data').val()});
+			// attaches event to the form to send messages to the chat room
+			$('form#chat_room').submit(function(event) {
+		        socket.emit('broadcast_event', {content: $('#chat_room_data').val()});
+		        // clean up the form
+		        $('#chat_room_data').val('');
 		        return false;
 		    });
 		});
@@ -34,8 +39,10 @@
 
     <div class="chat-content" id="chat_content"></div>
 
-	<form id="broadcast" method="POST" action='#'>
-        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
-        <input type="submit" value="Broadcast">
+	<form id="chat_room" method="POST" action='#'>
+        <input type="text" name="chat_room_data" id="chat_room_data"
+        		placeholder="Message {{ chat_room.title }}" size="50"
+        		autocomplete="off">
+        <input type="submit" id="chat_room_submit" value="Broadcast"  disabled="disabled">
     </form>
 {% endblock %}
