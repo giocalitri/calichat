@@ -15,7 +15,8 @@ pip install -U -r requirements.txt
 ```
 And simply start the test web server
 ```
-python manage.py runserver 0.0.0.0:8888
+export FLASK_APP=calichat/calichat.py
+flask run --host=0.0.0.0
 ```
 
 ## Missing features and TODOs
