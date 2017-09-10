@@ -42,13 +42,13 @@ thread_lock = Lock()
 def index():
     """Index page."""
     if current_user.is_authenticated:
-        return redirect(url_for('rooms'))
+        return redirect(url_for('room_list'))
     return render_template('index.html')
 
 
 @app.route('/room/', methods=['GET', 'POST'])
 @login_required
-def rooms():
+def room_list():
     """Lists rooms and allows to create new ones"""
     form = RoomForm()
     if request.method == 'POST':
@@ -59,14 +59,14 @@ def rooms():
                 new_room = Room(title=form.title.data)
                 db.session.add(new_room)
                 db.session.commit()
-                return redirect(url_for('rooms'))
+                return redirect(url_for('room_list'))
     chat_rooms = Room.query.order_by(collate(Room.title, 'NOCASE')).all()
-    return render_template('rooms.html', form=form, chat_rooms=chat_rooms)
+    return render_template('room_list.html', form=form, chat_rooms=chat_rooms)
 
 
 @app.route('/room/<int:room_id>/')
 @login_required
-def room(room_id):
+def room_detail(room_id):
     """
     The room where the chat happens
     """
@@ -88,7 +88,7 @@ def signup():
                 db.session.commit()
                 login_user(new_user)
                 flash("User created!", 'success')
-                return redirect(request.args.get('next') or url_for('rooms'))
+                return redirect(request.args.get('next') or url_for('room_list'))
         else:
             flash("Please enter valid data.", 'error')
     return render_template('signup.html', form=form)
@@ -105,7 +105,7 @@ def login():
                 if user.is_correct_password(form.password.data):
                     login_user(user)
                     flash("User logged in", 'success')
-                    return redirect(request.args.get('next') or url_for('rooms'))
+                    return redirect(request.args.get('next') or url_for('room_list'))
                 else:
                     flash("Wrong password", 'error')
             else:
@@ -122,3 +122,36 @@ def logout():
     logout_user()
     flash("Logged out", 'success')
     return redirect(url_for('index'))
+
+
+class ChatNamespace(Namespace):
+    """Socketio definitions"""
+
+    def on_connect(self):
+        emit('chat_response', {'data': 'Connected'})
+
+    def on_disconnect(self):
+        emit('chat_response', {'data': 'Disconnected'})
+
+    def on_my_event(self, message_json):
+        emit('chat_response', {'data': message_json['data']})
+
+    def on_my_broadcast_event(self, message_json):
+        emit('chat_response', {'data': message_json['data']}, broadcast=True)
+
+    def on_room_event(self, message_json):
+        emit('chat_response', {'data': message_json['data']}, room=message_json['room'])
+
+    def on_join(self, message_json):
+        """Handler to join a room"""
+        join_room(message_json['room'])
+        emit('chat_response', {'data': 'In rooms: ' + ', '.join(rooms())})
+
+    def on_leave(self, message):
+        leave_room(message['room'])
+        emit('chat_response',
+             {'data': 'In rooms: ' + ', '.join(rooms()),
+              'count': session['receive_count']})
+
+
+socketio.on_namespace(ChatNamespace('/chat'))
