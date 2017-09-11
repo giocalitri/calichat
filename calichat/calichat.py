@@ -31,6 +31,7 @@ from calichat.app import create_app
 from calichat.extensions import db
 from calichat.forms import SignupForm, RoomForm
 from calichat.models import User, Room
+from calichat.utils import create_user_message, create_system_message
 
 app = create_app()
 
@@ -143,32 +144,19 @@ class ChatNamespace(Namespace):
         """Handler for connection"""
         emit(
             'chat_response',
-            {
-                'content': 'You are connected, {}'.format(current_user.email),
-                'sender': 'system',
-                'message_type': 'notification'
-            }
+            create_system_message('You are connected, {}'.format(current_user.email))
         )
 
     def on_disconnect(self):
         """Handler for disconnection"""
-        emit('chat_response', {'content': 'Disconnected'})
-
-    @login_required_socket
-    def on_echo_event(self, message_json):
-        """Handler to echo messages"""
-        emit('chat_response', {'content': message_json['content']})
+        emit('chat_response', create_system_message('Disconnected'))
 
     @login_required_socket
     def on_broadcast_event(self, message_json):
         """Handler to send broadcast messages"""
         emit(
             'chat_response',
-            {
-                'content': message_json['content'],
-                'sender': current_user.email,
-                'message_type': 'user_message'
-            },
+            create_user_message(message_json['content'], current_user.email),
             broadcast=True
         )
 
@@ -177,11 +165,7 @@ class ChatNamespace(Namespace):
         """Handler to send a message in a room"""
         emit(
             'chat_response',
-            {
-                'content': message_json['content'],
-                'sender': current_user.email,
-                'message_type': 'user_message'
-            },
+            create_user_message(message_json['content'], current_user.email),
             room=message_json['room_id']
         )
 
@@ -192,11 +176,7 @@ class ChatNamespace(Namespace):
         join_room(message_json['room_id'])
         emit(
             'chat_response',
-            {
-                'content': '{} joined the room'.format(current_user.email),
-                'sender': 'system',
-                'message_type': 'notification'
-            },
+            create_system_message('{} joined the room'.format(current_user.email)),
             room=message_json['room_id']
         )
 
@@ -206,11 +186,7 @@ class ChatNamespace(Namespace):
         leave_room(message_json['room_id'])
         emit(
             'chat_response',
-            {
-                'content': '{} left the room'.format(current_user.email),
-                'sender': 'system',
-                'message_type': 'notification'
-            },
+            create_system_message('{} left the room'.format(current_user.email)),
             room=message_json['room_id']
         )
 
