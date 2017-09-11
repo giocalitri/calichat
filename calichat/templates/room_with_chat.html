@@ -18,7 +18,15 @@
 
 			// event handler that takes care of all the messages received from the server
 			socket.on('chat_response', function(msgJson) {
-		        $('#chat_content').append($('<div/>').text(msgJson.content).html() + '<br/>');
+			  	let messageToDisplay;
+			  	if (msgJson.message_type == 'user_message'){
+			  		messageToDisplay = msgJson.sender + ': ' + msgJson.content;
+			  	}
+			  	else {
+			  	  	messageToDisplay = msgJson.content;
+			  	}
+
+		        $('#chat_content').append($('<div/>').text(messageToDisplay).html() + '<br/>');
 		    });
 
 			// attaches event to the form to send messages to the chat room
