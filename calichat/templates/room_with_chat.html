@@ -8,12 +8,15 @@
 		$(document).ready(function() {
 			let SERVER_URL = location.protocol + '//{{ config.SERVER_NAME }}{{ config.SOCKET_NAMESPACE }}';
 
+			let ROOM_ID = {{ chat_room.id }};
+
 			let socket = io.connect(SERVER_URL);
 
 			// enable the chat when connect event is received
 			socket.on('connect', function() {
 				$('#chat_room_submit').prop( "disabled", false );
 				// join the char room
+				socket.emit('join_room', {room_id: ROOM_ID});
 		    });
 
 			// event handler that takes care of all the messages received from the server
@@ -31,7 +34,13 @@
 
 			// attaches event to the form to send messages to the chat room
 			$('form#chat_room').submit(function(event) {
-		        socket.emit('broadcast_event', {content: $('#chat_room_data').val()});
+		        socket.emit(
+		            'room_event',
+		            {
+		            		content: $('#chat_room_data').val(),
+		            		room_id: ROOM_ID
+		            	}
+		        );
 		        // clean up the form
 		        $('#chat_room_data').val('');
 		        return false;

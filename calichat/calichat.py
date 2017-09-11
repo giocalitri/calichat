@@ -182,20 +182,37 @@ class ChatNamespace(Namespace):
                 'sender': current_user.email,
                 'message_type': 'user_message'
             },
-            room=message_json['room']
+            room=message_json['room_id']
         )
 
     @login_required_socket
-    def on_join(self, message_json):
+    def on_join_room(self, message_json):
         """Handler to join a room"""
-        join_room(message_json['room'])
-        emit('chat_response', {'content': 'In rooms: ' + ', '.join(rooms())})
+        # TODO: verify that the room id exists
+        join_room(message_json['room_id'])
+        emit(
+            'chat_response',
+            {
+                'content': '{} joined the room'.format(current_user.email),
+                'sender': 'system',
+                'message_type': 'notification'
+            },
+            room=message_json['room_id']
+        )
 
     @login_required_socket
-    def on_leave(self, message):
+    def on_leave_room(self, message_json):
         """Handler to leave a room"""
-        leave_room(message['room'])
-        emit('chat_response', {'content': 'In rooms: ' + ', '.join(rooms())})
+        leave_room(message_json['room_id'])
+        emit(
+            'chat_response',
+            {
+                'content': '{} left the room'.format(current_user.email),
+                'sender': 'system',
+                'message_type': 'notification'
+            },
+            room=message_json['room_id']
+        )
 
 
 socketio.on_namespace(ChatNamespace(app.config['SOCKET_NAMESPACE']))
