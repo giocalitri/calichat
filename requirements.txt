@@ -8,4 +8,5 @@ flask-wtf
 ipython
 gevent
 gevent-websocket
+pytz
 sqlalchemy-utils

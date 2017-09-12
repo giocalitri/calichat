@@ -1,5 +1,8 @@
 """Utility functions"""
+from datetime import datetime
 from uuid import uuid4
+
+import pytz
 
 
 def create_message_structure(content, sender, message_type):
@@ -11,6 +14,7 @@ def create_message_structure(content, sender, message_type):
         'sender': sender,
         'message_type': message_type,
         'id': uuid4().hex,
+        'timestamp': datetime.now(tz=pytz.UTC).isoformat()
     }
 
 

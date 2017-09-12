@@ -154,18 +154,20 @@ class ChatNamespace(Namespace):
     @login_required_socket
     def on_broadcast_event(self, message_json):
         """Handler to send broadcast messages"""
+        response_json = create_user_message(message_json['content'], current_user.email)
         emit(
             'chat_response',
-            create_user_message(message_json['content'], current_user.email),
+            response_json,
             broadcast=True
         )
 
     @login_required_socket
     def on_room_event(self, message_json):
         """Handler to send a message in a room"""
+        response_json = create_user_message(message_json['content'], current_user.email)
         emit(
             'chat_response',
-            create_user_message(message_json['content'], current_user.email),
+            response_json,
             room=message_json['room_id']
         )
 

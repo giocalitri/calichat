@@ -4,6 +4,7 @@
 
 {% block head%}
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js"></script>
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function() {
 			let SERVER_URL = location.protocol + '//{{ config.SERVER_NAME }}{{ config.SOCKET_NAMESPACE }}';
@@ -28,8 +29,8 @@
 			  	else {
 			  	  	messageToDisplay = msgJson.content;
 			  	}
-
-		        $('#chat_content').append($('<div/>').text(messageToDisplay).html() + '<br/>');
+			  	let localTime = moment(new Date(msgJson.timestamp)).format('LTS');
+		        $('#chat_content').append('<div class="chat_message" id="' + msgJson.id + '">['+ localTime +'] '+ messageToDisplay +'</div>');
 		    });
 
 			// attaches event to the form to send messages to the chat room
