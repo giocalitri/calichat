@@ -55,7 +55,7 @@ class Message(db.Model):
     """
     uuid = db.Column(UUIDType, primary_key=True, default=uuid.uuid4)
     message = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime)
-    room_id = db.Column(db.Integer, db.ForeignKey('room.id', ondelete='CASCADE'))
+    timestamp = db.Column(db.DateTime, index=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('room.id', ondelete='CASCADE'), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     message_type = db.Column(db.String(120))

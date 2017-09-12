@@ -1,5 +1,4 @@
 """The actual app"""
-from datetime import datetime
 from functools import wraps
 from threading import Lock
 
@@ -26,7 +25,6 @@ from flask_socketio import (
     rooms,
     disconnect,
 )
-import pytz
 from sqlalchemy.sql import collate
 
 from calichat.app import create_app
@@ -144,23 +142,21 @@ class ChatNamespace(Namespace):
 
     def on_connect(self):
         """Handler for connection"""
+        response_json, _ = create_system_message('You are connected, {}'.format(current_user.email))
         emit(
             'chat_response',
-            create_system_message('You are connected, {}'.format(current_user.email))
+            response_json
         )
 
     def on_disconnect(self):
         """Handler for disconnection"""
-        emit('chat_response', create_system_message('Disconnected'))
+        response_json, _ = create_system_message('Disconnected')
+        emit('chat_response', response_json)
 
     @login_required_socket
     def on_room_event(self, message_json):
         """Handler to send a message in a room"""
-        response_json = create_user_message(message_json['content'], current_user.email)
-        timestamp = datetime.now(tz=pytz.UTC)
-        # add a timestamp to the messsage
-        response_json['timestamp'] = timestamp.isoformat()
-
+        response_json, timestamp = create_user_message(message_json['content'], current_user.email)
         emit(
             'chat_response',
             response_json,
@@ -183,9 +179,10 @@ class ChatNamespace(Namespace):
         """Handler to join a room"""
         # TODO: verify that the room id exists
         join_room(message_json['room_id'])
+        response_json, _ = create_system_message('{} joined the room'.format(current_user.email))
         emit(
             'chat_response',
-            create_system_message('{} joined the room'.format(current_user.email)),
+            response_json,
             room=message_json['room_id']
         )
 
@@ -193,9 +190,10 @@ class ChatNamespace(Namespace):
     def on_leave_room(self, message_json):
         """Handler to leave a room"""
         leave_room(message_json['room_id'])
+        response_json, _ = create_system_message('{} left the room'.format(current_user.email))
         emit(
             'chat_response',
-            create_system_message('{} left the room'.format(current_user.email)),
+            response_json,
             room=message_json['room_id']
         )
 
