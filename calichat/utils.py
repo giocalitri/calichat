@@ -32,3 +32,17 @@ def create_system_message(content):
     Shortcut for create_message_structure user messages
     """
     return create_message_structure(content, sender='system', message_type='notification')
+
+
+def serialize_pagination(pagination_obj):
+    """
+    Returns a list of serialized objects for the elements in the iterable
+    """
+    return {
+        'items': list(reversed([item.to_json() for item in pagination_obj.items])),
+        'current_page': pagination_obj.page,
+        'next_page': pagination_obj.next_num,
+        'prev_page': pagination_obj.prev_num,
+        'total_pages': pagination_obj.pages,
+        'total_number_items': pagination_obj.total,
+    }

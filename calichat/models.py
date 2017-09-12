@@ -1,11 +1,25 @@
 """Models"""
 import uuid
 
+import pytz
+
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from sqlalchemy_utils import UUIDType
 
 from calichat.extensions import db, bcrypt
+
+
+class UTCAwareDateTime(db.TypeDecorator):
+    '''
+    Custom column type.
+    Results returned as aware datetimes, not naive ones.
+    '''
+    impl = db.DateTime
+
+    def process_result_value(self, value, dialect):
+        return value.replace(tzinfo=pytz.utc)
 
 
 class User(db.Model, UserMixin):
@@ -55,7 +69,20 @@ class Message(db.Model):
     """
     uuid = db.Column(UUIDType, primary_key=True, default=uuid.uuid4)
     message = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True)
+    timestamp = db.Column(UTCAwareDateTime, index=True)
     room_id = db.Column(db.Integer, db.ForeignKey('room.id', ondelete='CASCADE'), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = relationship("User")
     message_type = db.Column(db.String(120))
+
+    def to_json(self):
+        """
+        Serializes the object to a message
+        """
+        return {
+            'id': self.uuid.hex,
+            'content': self.message,
+            'timestamp': self.timestamp.isoformat(),
+            'sender': self.user.email,
+            'message_type': self.message_type,
+        }

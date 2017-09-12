@@ -13,6 +13,25 @@
 
 			let socket = io.connect(SERVER_URL);
 
+			let oldMessages = {{ old_messages|tojson }};
+
+			let formatMessage = function(msgJson) {
+			  	let messageToDisplay;
+			  	if (msgJson.message_type == 'user_message'){
+			  		messageToDisplay = msgJson.sender + ': ' + msgJson.content;
+			  	}
+			  	else {
+			  	  	messageToDisplay = msgJson.content;
+			  	}
+			  	let localTime = moment(new Date(msgJson.timestamp)).format('LTS');
+				return '<div class="chat_message" id="' + msgJson.id + '">['+ localTime +'] '+ messageToDisplay +'</div>'
+			};
+
+			// append the most recent old messages
+			oldMessages.items.forEach(function(msgJson) {
+				$('#chat_content').append(formatMessage(msgJson));
+			});
+
 			// enable the chat when connect event is received
 			socket.on('connect', function() {
 				$('#chat_room_submit').prop( "disabled", false );
@@ -22,15 +41,7 @@
 
 			// event handler that takes care of all the messages received from the server
 			socket.on('chat_response', function(msgJson) {
-			  	let messageToDisplay;
-			  	if (msgJson.message_type == 'user_message'){
-			  		messageToDisplay = msgJson.sender + ': ' + msgJson.content;
-			  	}
-			  	else {
-			  	  	messageToDisplay = msgJson.content;
-			  	}
-			  	let localTime = moment(new Date(msgJson.timestamp)).format('LTS');
-		        $('#chat_content').append('<div class="chat_message" id="' + msgJson.id + '">['+ localTime +'] '+ messageToDisplay +'</div>');
+		        $('#chat_content').append(formatMessage(msgJson));
 		    });
 
 			// attaches event to the form to send messages to the chat room
@@ -55,11 +66,7 @@
 
 	<h3>{{ chat_room.title }} (<a href="{{ url_for('room_list') }}">leave</a>)</h3>
 
-    <div class="chat-content" id="chat_content">
-    	{% for message in old_messages.items | reverse %}
-    		<div class="chat_message" id="{{ message.uuid }}">[{{ message.timestamp }}] {{ message.message }}</div>
-    	{% endfor %}
-    </div>
+    <div class="chat-content" id="chat_content"></div>
 
 	<form id="chat_room" method="POST" action='#'>
         <input type="text" name="chat_room_data" id="chat_room_data"

@@ -32,7 +32,11 @@ from calichat.app import create_app
 from calichat.extensions import db
 from calichat.forms import SignupForm, RoomForm
 from calichat.models import User, Room, Message
-from calichat.utils import create_user_message, create_system_message
+from calichat.utils import (
+    create_user_message,
+    create_system_message,
+    serialize_pagination,
+)
 
 app = create_app()
 
@@ -74,8 +78,10 @@ def room_detail(room_id):
     The room where the chat happens
     """
     room = Room.query.filter_by(id=room_id).first_or_404()
-    first_old_messages = Message.query.order_by(desc(Message.timestamp)).paginate()
-    return render_template('room_with_chat.html', chat_room=room, old_messages=first_old_messages)
+    old_messages = serialize_pagination(
+        Message.query.filter_by(room_id=room_id).order_by(desc(Message.timestamp)).paginate()
+    )
+    return render_template('room_with_chat.html', chat_room=room, old_messages=old_messages)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
