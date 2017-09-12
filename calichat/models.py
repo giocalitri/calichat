@@ -58,3 +58,4 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime)
     room_id = db.Column(db.Integer, db.ForeignKey('room.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    message_type = db.Column(db.String(120))

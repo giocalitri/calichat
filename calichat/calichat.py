@@ -1,4 +1,5 @@
 """The actual app"""
+from datetime import datetime
 from functools import wraps
 from threading import Lock
 
@@ -25,12 +26,13 @@ from flask_socketio import (
     rooms,
     disconnect,
 )
+import pytz
 from sqlalchemy.sql import collate
 
 from calichat.app import create_app
 from calichat.extensions import db
 from calichat.forms import SignupForm, RoomForm
-from calichat.models import User, Room
+from calichat.models import User, Room, Message
 from calichat.utils import create_user_message, create_system_message
 
 app = create_app()
@@ -152,24 +154,29 @@ class ChatNamespace(Namespace):
         emit('chat_response', create_system_message('Disconnected'))
 
     @login_required_socket
-    def on_broadcast_event(self, message_json):
-        """Handler to send broadcast messages"""
-        response_json = create_user_message(message_json['content'], current_user.email)
-        emit(
-            'chat_response',
-            response_json,
-            broadcast=True
-        )
-
-    @login_required_socket
     def on_room_event(self, message_json):
         """Handler to send a message in a room"""
         response_json = create_user_message(message_json['content'], current_user.email)
+        timestamp = datetime.now(tz=pytz.UTC)
+        # add a timestamp to the messsage
+        response_json['timestamp'] = timestamp.isoformat()
+
         emit(
             'chat_response',
             response_json,
             room=message_json['room_id']
         )
+
+        message_in_db = Message(
+            uuid=response_json['id'],
+            message=response_json['content'],
+            timestamp=timestamp,
+            room_id=message_json['room_id'],
+            user_id=current_user.id,
+            message_type=response_json['message_type'],
+        )
+        db.session.add(message_in_db)
+        db.session.commit()
 
     @login_required_socket
     def on_join_room(self, message_json):
