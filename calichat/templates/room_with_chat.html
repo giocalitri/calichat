@@ -55,7 +55,11 @@
 
 	<h3>{{ chat_room.title }} (<a href="{{ url_for('room_list') }}">leave</a>)</h3>
 
-    <div class="chat-content" id="chat_content"></div>
+    <div class="chat-content" id="chat_content">
+    	{% for message in old_messages.items | reverse %}
+    		<div class="chat_message" id="{{ message.uuid }}">[{{ message.timestamp }}] {{ message.message }}</div>
+    	{% endfor %}
+    </div>
 
 	<form id="chat_room" method="POST" action='#'>
         <input type="text" name="chat_room_data" id="chat_room_data"

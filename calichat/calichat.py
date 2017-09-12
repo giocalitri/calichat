@@ -25,6 +25,7 @@ from flask_socketio import (
     rooms,
     disconnect,
 )
+from sqlalchemy import desc
 from sqlalchemy.sql import collate
 
 from calichat.app import create_app
@@ -73,7 +74,8 @@ def room_detail(room_id):
     The room where the chat happens
     """
     room = Room.query.filter_by(id=room_id).first_or_404()
-    return render_template('room_with_chat.html', chat_room=room)
+    first_old_messages = Message.query.order_by(desc(Message.timestamp)).paginate()
+    return render_template('room_with_chat.html', chat_room=room, old_messages=first_old_messages)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
