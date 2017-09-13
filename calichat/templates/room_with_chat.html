@@ -49,6 +49,14 @@
 					});
 			};
 
+			// define a custom function to compute the height of the chatroom box
+			// TODO: remove this temporary hack and find a better solution
+			let getChatBoxHeight = function() {
+			  	let height = 0;
+			  	$('#chat-content').children().each(function(index){ height += $(this).height()});
+			  	return height;
+			};
+
 			// append the most recent old messages
 			oldMessages.items.forEach(function(msgJson) {
 				$('#chat-content').prepend(formatMessage(msgJson));
@@ -93,7 +101,7 @@
 			// event handler that takes care of all the messages received from the server
 			socket.on('chat_response', function(msgJson) {
 		        $('#chat-content').append(formatMessage(msgJson));
-		        $('#chat-content').scrollTop($('#chat-content').height());
+		        $('#chat-content').scrollTop(getChatBoxHeight());
 		    });
 
 			// attaches event to the form to send messages to the chat room
