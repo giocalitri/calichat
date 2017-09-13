@@ -7,11 +7,12 @@
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js"></script>
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function() {
-			let SERVER_URL = location.protocol + '//{{ config.SERVER_NAME }}{{ config.SOCKET_NAMESPACE }}';
+			let WEBSOCKET_SERVER_URL = location.protocol + '//{{ config.SERVER_NAME }}{{ config.SOCKET_NAMESPACE }}';
 			let ROOM_ID = {{ chat_room.id }};
-			let socket = io.connect(SERVER_URL);
+			let socket = io.connect(WEBSOCKET_SERVER_URL);
 			let oldMessages = {{ old_messages|tojson }};
 			let	currentUser = '{{ current_user.email }}';
+			let oldMessageURL = "{{ url_for('get_old_messages', room_id=chat_room.id) }}";
 
 			// function to format chat messages
 			let formatMessage = function(msgJson) {
@@ -31,9 +32,36 @@
 					msgJson.id + '"> '+ deleteSpan +' ['+ localTime +'] '+ messageToDisplay +'</div>';
 			};
 
+			// function to load older messages after the first ones passed via the template
+			let loadAndShowOldMessages = function() {
+				$.get(oldMessageURL, {page: $('#load-old-messages').data('next-page')})
+					.done(function(data) {
+					  	data.items.forEach(function(msgJson) {
+							$('#chat-content').prepend(formatMessage(msgJson));
+						});
+					  	$('#chat-content').prepend($('#load-old-messages'));
+						if (data.next_page === null) {
+						  	$('#load-old-messages').hide();
+						}
+						else {
+						  	$('#load-old-messages').data('next-page', data.next_page);
+						}
+					});
+			};
+
 			// append the most recent old messages
 			oldMessages.items.forEach(function(msgJson) {
-				$('#chat-content').append(formatMessage(msgJson));
+				$('#chat-content').prepend(formatMessage(msgJson));
+			});
+			// show the load-old-messages link if there are other old messages
+			if (oldMessages.next_page !== null) {
+			  	$('#chat-content').prepend($('#load-old-messages'));
+			  	$('#load-old-messages').show();
+			  	$('#load-old-messages').data('next-page', oldMessages.next_page);
+			}
+			// and attach an event handler to load more
+			$('#load-old-messages').on('click', function() {
+				loadAndShowOldMessages();
 			});
 
 			// enable the chat when connect event is received
@@ -89,8 +117,9 @@
 {% block body %}
 
 	<h3>{{ chat_room.title }} (<a class="leave-room" href="{{ url_for('room_list') }}">leave</a>)</h3>
-
-    <div class="chat-content" id="chat-content"></div>
+    <div class="chat-content" id="chat-content">
+    		<div class="load-old-messages" id="load-old-messages"><a href="#">Older messages</a></div>
+    </div>
 
 	<form id="chat_room" method="POST" action='#'>
         <input type="text" name="chat_room_data" id="chat_room_data"

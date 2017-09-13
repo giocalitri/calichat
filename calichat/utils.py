@@ -39,7 +39,7 @@ def serialize_pagination(pagination_obj):
     Returns a list of serialized objects for the elements in the iterable
     """
     return {
-        'items': list(reversed([item.to_json() for item in pagination_obj.items])),
+        'items': [item.to_json() for item in pagination_obj.items],
         'current_page': pagination_obj.page,
         'next_page': pagination_obj.next_num,
         'prev_page': pagination_obj.prev_num,
