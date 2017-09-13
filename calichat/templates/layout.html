@@ -3,6 +3,21 @@
 <head>
     <title>Calichat - {% block titlehead %}{% endblock %}</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style type="text/css">
+		.all-content {
+			max-width: 800px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+    		.chat-content {
+    			overflow:scroll;
+    			max-height:400px;
+    			max-width: 600px;
+    			box-sizing: border-box;
+    			border: 10px solid #707B7C;
+    			margin-bottom: 20px;
+    		}
+    </style>
     {% block head%}{% endblock %}
 </head>
 <body>
@@ -21,6 +36,8 @@
 	    </ul>
 	  {% endif %}
 	{% endwith %}
+	<div class="all-content">
     {% block body %}{% endblock %}
+    </div>
 </body>
 </html>

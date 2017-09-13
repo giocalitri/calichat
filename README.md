@@ -21,6 +21,7 @@ flask run --host=0.0.0.0
 
 ## Missing features and TODOs
 
+* Move all the JS and CSS outside the templates.
 * Unit tests: I did not write any, but this should be priority #1 in a future iteration of the project
 * Docker environment so the code can run with (almost) production like settings
 
