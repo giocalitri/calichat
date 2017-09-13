@@ -88,7 +88,7 @@
 
 {% block body %}
 
-	<h3>{{ chat_room.title }} (<a href="{{ url_for('room_list') }}">leave</a>)</h3>
+	<h3>{{ chat_room.title }} (<a class="leave-room" href="{{ url_for('room_list') }}">leave</a>)</h3>
 
     <div class="chat-content" id="chat-content"></div>
 
