@@ -14,6 +14,9 @@ from calichat.models import User
 
 
 def create_app():
+    """
+    Function to create a flask app
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
 

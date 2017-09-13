@@ -3,25 +3,26 @@ from functools import wraps
 from threading import Lock
 
 from flask import (
+    flash,
+    jsonify,
+    redirect,
     render_template,
     request,
-    flash,
-    redirect,
     url_for,
 )
 from flask_login import (
-    login_user,
-    login_required,
-    logout_user,
     current_user,
+    login_required,
+    login_user,
+    logout_user,
 )
 from flask_socketio import (
-    SocketIO,
-    Namespace,
+    disconnect,
     emit,
     join_room,
     leave_room,
-    disconnect,
+    Namespace,
+    SocketIO,
 )
 from sqlalchemy import desc
 from sqlalchemy.exc import StatementError
@@ -30,7 +31,11 @@ from sqlalchemy.sql import collate
 from calichat.app import create_app
 from calichat.extensions import db
 from calichat.forms import SignupForm, RoomForm
-from calichat.models import User, Room, Message
+from calichat.models import (
+    Message,
+    Room,
+    User,
+)
 from calichat.utils import (
     create_user_message,
     create_system_message,
@@ -131,6 +136,25 @@ def logout():
     logout_user()
     flash("Logged out", 'success')
     return redirect(url_for('index'))
+
+
+@app.route("/api/v0/room/<int:room_id>/messages/")
+@login_required
+def get_old_messages(room_id):
+    """
+    REST view to get the old messages.
+    Using this insead of websockets just as a demonstration.
+    """
+    room = Room.query.filter_by(id=room_id).first_or_404()
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page_num = 1
+    old_messages = serialize_pagination(
+        Message.query.filter_by(
+            room_id=room_id).order_by(desc(Message.timestamp)).paginate(page=page, error_out=False)
+    )
+    return jsonify(old_messages)
 
 
 def login_required_socket(f):
