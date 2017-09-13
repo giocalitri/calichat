@@ -21,11 +21,10 @@ from flask_socketio import (
     emit,
     join_room,
     leave_room,
-    close_room,
-    rooms,
     disconnect,
 )
 from sqlalchemy import desc
+from sqlalchemy.exc import StatementError
 from sqlalchemy.sql import collate
 
 from calichat.app import create_app
@@ -202,6 +201,40 @@ class ChatNamespace(Namespace):
         emit(
             'chat_response',
             response_json,
+            room=message_json['room_id']
+        )
+
+    @login_required_socket
+    def on_delete_message(self, message_json):
+        """
+        Handler to delete a message.
+        This checks that the user that tries to delete it, is the massage writer
+        """
+        message_id = message_json['message_id']
+        try:
+            message_in_db = Message.query.get(message_id)
+        except StatementError:
+            emit(
+                'error_response',
+                {'content': 'The server has no knowledge of this message'}
+            )
+            return
+        try:
+            if message_in_db.user != current_user:
+                emit(
+                    'error_response',
+                    {'content': 'You are not allowed to delete this message'}
+                )
+                return
+        except AttributeError:
+            pass
+        # perfom the actual deletion in the database
+        db.session.delete(message_in_db)
+        db.session.commit()
+
+        emit(
+            'delete_message_response',
+            {'message_id': message_id},
             room=message_json['room_id']
         )
 

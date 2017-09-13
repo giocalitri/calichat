@@ -8,13 +8,12 @@
 	<script type="text/javascript" charset="utf-8">
 		$(document).ready(function() {
 			let SERVER_URL = location.protocol + '//{{ config.SERVER_NAME }}{{ config.SOCKET_NAMESPACE }}';
-
 			let ROOM_ID = {{ chat_room.id }};
-
 			let socket = io.connect(SERVER_URL);
-
 			let oldMessages = {{ old_messages|tojson }};
+			let	currentUser = '{{ current_user.email }}';
 
+			// function to format chat messages
 			let formatMessage = function(msgJson) {
 			  	let messageToDisplay;
 			  	if (msgJson.message_type == 'user_message'){
@@ -24,12 +23,17 @@
 			  	  	messageToDisplay = msgJson.content;
 			  	}
 			  	let localTime = moment(new Date(msgJson.timestamp)).format('LTS');
-				return '<div class="chat_message" id="' + msgJson.id + '">['+ localTime +'] '+ messageToDisplay +'</div>'
+			  	let deleteSpan = '   ';
+			  	if (msgJson.sender == currentUser) {
+					deleteSpan = '<span class="delete-message"> 🗑 </span>';
+			  	}
+				return '<div class="chat-message" id="' +
+					msgJson.id + '"> '+ deleteSpan +' ['+ localTime +'] '+ messageToDisplay +'</div>';
 			};
 
 			// append the most recent old messages
 			oldMessages.items.forEach(function(msgJson) {
-				$('#chat_content').append(formatMessage(msgJson));
+				$('#chat-content').append(formatMessage(msgJson));
 			});
 
 			// enable the chat when connect event is received
@@ -37,11 +41,30 @@
 				$('#chat_room_submit').prop( "disabled", false );
 				// join the char room
 				socket.emit('join_room', {room_id: ROOM_ID});
+
+				// attach a click event for deleting the messages
+				$('#chat-content').on('click', '.delete-message', function() {
+					let messageIdToDelete = $(this).parent()[0].id;
+					socket.emit('delete_message', {room_id: ROOM_ID, message_id: messageIdToDelete});
+				});
 		    });
+
+			// event handler that takes care of deleting messages from the page
+			socket.on('delete_message_response', function(msgJson) {
+		        // performe the delete
+		        $('#'+ msgJson.message_id).hide('slow', function(){
+		          this.remove();
+		        });
+		    });
+
+			// handle error messages as simple alerts
+			socket.on('error_response', function(msgJson) {
+				alert(msgJson['content']);
+			});
 
 			// event handler that takes care of all the messages received from the server
 			socket.on('chat_response', function(msgJson) {
-		        $('#chat_content').append(formatMessage(msgJson));
+		        $('#chat-content').append(formatMessage(msgJson));
 		    });
 
 			// attaches event to the form to send messages to the chat room
@@ -66,12 +89,12 @@
 
 	<h3>{{ chat_room.title }} (<a href="{{ url_for('room_list') }}">leave</a>)</h3>
 
-    <div class="chat-content" id="chat_content"></div>
+    <div class="chat-content" id="chat-content"></div>
 
 	<form id="chat_room" method="POST" action='#'>
         <input type="text" name="chat_room_data" id="chat_room_data"
         		placeholder="Message {{ chat_room.title }}" size="50"
         		autocomplete="off">
-        <input type="submit" id="chat_room_submit" value="Broadcast"  disabled="disabled">
+        <input type="submit" id="chat_room_submit" value="Send"  disabled="disabled">
     </form>
 {% endblock %}
