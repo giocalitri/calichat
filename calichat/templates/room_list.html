@@ -18,7 +18,7 @@
 	{% endif %}
 	<form method="POST" action="{{ url_for('room_list') }}">
 	    {{ form.hidden_tag() }}
-	    {{ form.title(size=50) }}
+	    {{ form.title(size=50, placeholder="New Room Title") }}
 	   	{{ form.submit }}
 	</form>
 

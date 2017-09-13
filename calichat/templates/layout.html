@@ -4,6 +4,38 @@
     <title>Calichat - {% block titlehead %}{% endblock %}</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <style type="text/css">
+    		body {
+    			font-size: large;
+    		}
+    		input[type=submit] {
+		    background-color: #5DADE2;
+		    border: none;
+		    color: white;
+		    padding: 10px 20px;
+		    text-decoration: none;
+		    margin: 4px 2px;
+		    cursor: pointer;
+		    font-size: large;
+		}
+		input[type=text], input[type=password] {
+			width: 400px;
+		    padding: 6px 10px;
+		    margin: 8px 0;
+		    box-sizing: border-box;
+		    font-size: large;
+		}
+		ul {
+			padding: 0;
+    			list-style-type: none;
+		}
+    		.body-content {
+    			max-width: 1024px;
+    			margin-left: auto;
+			margin-right: auto;
+    		}
+    		.user-sign-in {
+    			float: right;
+    		}
 		.all-content {
 			max-width: 600px;
 			margin-left: auto;
@@ -12,7 +44,7 @@
     		.chat-content {
     			overflow: scroll;
     			max-height:400px;
-    			max-width: 600px;
+    			min-height:400px;
     			box-sizing: border-box;
     			border: 10px solid #707B7C;
     			margin-bottom: 20px;
@@ -23,27 +55,36 @@
     		.load-old-messages {
     			display: none;
     		}
+    		.delete-message {
+    			font-size: x-small;
+    			margin-right: 5px;
+    		}
     </style>
     {% block head%}{% endblock %}
 </head>
 <body>
-	{% if current_user.is_authenticated %}
-	  Logged in as {{ current_user.email }}. <a href="{{ url_for('logout') }}">Logout</a>
-	{% else %}
-	  <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('signup') }}">Sign Up</a>
-	{% endif %}
+	<div class="body-content">
+		<div class="user-sign-in">
+			{% if current_user.is_authenticated %}
+			  Logged in as {{ current_user.email }}. <a href="{{ url_for('logout') }}">Logout</a>
+			{% else %}
+			  <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('signup') }}">Sign Up</a>
+			{% endif %}
+		</div>
 
-	{% with messages = get_flashed_messages(with_categories=true) %}
-	  {% if messages %}
-	    <ul class=flashes>
-	    {% for category, message in messages %}
-	      <li class="{{ category }}">{{ message }}</li>
-	    {% endfor %}
-	    </ul>
-	  {% endif %}
-	{% endwith %}
-	<div class="all-content">
-    {% block body %}{% endblock %}
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		  {% if messages %}
+		    <ul class=flashes>
+		    {% for category, message in messages %}
+		      <li class="{{ category }}">{{ message }}</li>
+		    {% endfor %}
+		    </ul>
+		  {% endif %}
+		{% endwith %}
+
+		<div class="all-content">
+	    {% block body %}{% endblock %}
+	    </div>
     </div>
 </body>
 </html>
