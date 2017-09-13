@@ -19,6 +19,7 @@ class UTCAwareDateTime(db.TypeDecorator):
     impl = db.DateTime
 
     def process_result_value(self, value, dialect):
+        """Custom process of the data to add UTC"""
         return value.replace(tzinfo=pytz.utc)
 
 
