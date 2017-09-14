@@ -10,3 +10,4 @@ gevent
 gevent-websocket
 pytz
 sqlalchemy-utils
+uwsgi
