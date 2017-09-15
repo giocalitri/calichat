@@ -10,27 +10,33 @@ services:
     ports:
       - "6379"
 
-  web:
+  python:
     build: .
-    command: >
-      /bin/bash -c '
-      sleep 3 &&
-      uwsgi uwsgi.ini'
-    ports:
-      - "5000:5000"
+    command: /bin/true
     volumes:
       - .:/src
     environment:
       DEBUG: 'True'
       NODE_ENV: 'development'
-      PORT: 5000
       DATABASE_URL: postgres://postgres@db:5432/postgres
       DOCKER_HOST: ${DOCKER_HOST:-missing}
       REDIS_URL: redis://redis:6379/0
       FLASK_APP: calichat/calichat.py
       FLASK_DEBUG: 1
     env_file: .env
+
+  web:
+    image: calichat_python
+    extends:
+      service: python
+    environment:
+      PORT: 5000
+    command: >
+      /bin/bash -c '
+      sleep 3 &&
+      uwsgi uwsgi.ini'
+    ports:
+      - "5000:5000"
     links:
       - db
       - redis
-
