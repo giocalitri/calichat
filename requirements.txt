@@ -1,13 +1,15 @@
 flask
-flask_bcrypt
 flask-login
 flask-shell-ipython
 flask-socketio
 flask-sqlalchemy
 flask-wtf
-ipython
+flask_bcrypt
 gevent
 gevent-websocket
+ipython
+psycopg2
 pytz
+redis
 sqlalchemy-utils
 uwsgi

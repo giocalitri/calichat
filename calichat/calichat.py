@@ -24,9 +24,11 @@ from flask_socketio import (
     Namespace,
     SocketIO,
 )
-from sqlalchemy import desc
+from sqlalchemy import (
+    desc,
+    func,
+)
 from sqlalchemy.exc import StatementError
-from sqlalchemy.sql import collate
 
 from calichat.app import create_app
 from calichat.extensions import db
@@ -71,7 +73,7 @@ def room_list():
                 db.session.add(new_room)
                 db.session.commit()
                 return redirect(url_for('room_list'))
-    chat_rooms = Room.query.order_by(collate(Room.title, 'NOCASE')).all()
+    chat_rooms = Room.query.order_by(func.lower(Room.title)).all()
     return render_template('room_list.html', form=form, chat_rooms=chat_rooms)
 
 
