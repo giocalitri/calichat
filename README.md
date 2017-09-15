@@ -16,9 +16,6 @@ cp .env.example .env
 ```
 Then edit the .env file and set `SERVER_BASE_NAME` to your own local url (by default it is `calichat.local`).
 
-Add an entry to your `/etc/hosts` to resolve `calichat.local` (or your local name) to the IP where docker is running.
-Note: if you run docker-machine, the IP is NOT 127.0.0.1
-
 Build the containers and run the app
 ```
 docker-compose build
@@ -69,10 +66,14 @@ uwsgi uwsgi.ini
 if you want a produnction like server.
 
 
-### The URL
-The chat should be available at http://calicat.local:5000/
+### Use the chat
+Add an entry to your `/etc/hosts` to resolve `calichat.local` (or your local name) to the IP where the app is running.
+Note: if you run docker-machine, the IP is NOT 127.0.0.1
 
-Note: if you are using Docker, http://calicat.local:5001/ should also be available to simulate a multiple workers environment.
+The chat should then be available at http://calichat.local:5000/
+
+Note: if you are using Docker, http://calichat.local:5001/ should also be available to simulate an environment
+with multiple workers using a message queue.
 
 
 ## Missing features and TODOs
