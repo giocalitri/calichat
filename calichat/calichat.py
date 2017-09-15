@@ -163,14 +163,14 @@ def get_old_messages(room_id):
     return jsonify(old_messages)
 
 
-def login_required_socket(f):
+def login_required_socket(func):
     """Custom decorator to be used on websockets definitions"""
-    @wraps(f)
+    @wraps(func)
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
             disconnect()
         else:
-            return f(*args, **kwargs)
+            return func(*args, **kwargs)
     return wrapped
 
 
