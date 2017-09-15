@@ -22,7 +22,7 @@ docker-compose build
 docker-compose up
 ```
 
-Skip the next section and go to (Use the chat)[#use-the-chat]
+Skip the next section and go to [Use the chat](#use-the-chat)
 
 ### Without docker
 
