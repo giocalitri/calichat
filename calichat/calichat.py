@@ -1,4 +1,7 @@
 """The actual app"""
+from gevent import monkey
+monkey.patch_all()
+
 from functools import wraps
 from threading import Lock
 
@@ -31,6 +34,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import StatementError
 
 from calichat.app import create_app
+from calichat.config import Config
 from calichat.extensions import db
 from calichat.forms import SignupForm, RoomForm
 from calichat.models import (
@@ -46,7 +50,7 @@ from calichat.utils import (
 
 app = create_app()
 
-socketio = SocketIO(app, async_mode=None)
+socketio = SocketIO(app, async_mode=None,  message_queue=Config.REDIS_URL)
 thread = None
 thread_lock = Lock()
 
@@ -147,11 +151,11 @@ def get_old_messages(room_id):
     REST view to get the old messages.
     Using this insead of websockets just as a demonstration.
     """
-    room = Room.query.filter_by(id=room_id).first_or_404()
+    Room.query.filter_by(id=room_id).first_or_404()
     try:
         page = int(request.args.get('page', 1))
     except ValueError:
-        page_num = 1
+        page = 1
     old_messages = serialize_pagination(
         Message.query.filter_by(
             room_id=room_id).order_by(desc(Message.timestamp)).paginate(page=page, error_out=False)
