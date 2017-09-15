@@ -22,7 +22,7 @@ docker-compose build
 docker-compose up
 ```
 
-Skip the nexrt section and go to #use-the-chat
+Skip the nexrt section and go to [#use-the-chat](Use the chat)
 
 ### Without docker
 
