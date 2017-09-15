@@ -22,6 +22,8 @@ docker-compose build
 docker-compose up
 ```
 
+Skip the nexrt section and go to #use-the-chat
+
 ### Without docker
 
 I am tempted to say "you are on your own".... but let's see if I can help.
@@ -42,7 +44,7 @@ pip uninstall uwsgi
 CFLAGS="-I/usr/local/opt/openssl/include" LDFLAGS="-L/usr/local/opt/openssl/lib" UWSGI_PROFILE_OVERRIDE=ssl=true pip install uwsgi -Iv --no-use-wheel
 ```
 
-Then you need to export few environment variables (change the database urls to your own ones).
+Then you need to export few environment variables (change redis and database url to your own).
 ```
 export DEBUG=True
 export DATABASE_URL=postgres://postgres@db:5432/postgres
