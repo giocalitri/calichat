@@ -16,7 +16,6 @@ services:
     volumes:
       - .:/src
     environment:
-      DEBUG: 'True'
       NODE_ENV: 'development'
       DATABASE_URL: postgres://postgres@db:5432/postgres
       DOCKER_HOST: ${DOCKER_HOST:-missing}
