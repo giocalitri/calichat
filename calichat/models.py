@@ -27,6 +27,8 @@ class User(db.Model, UserMixin):
     """
     Model for users
     """
+    __tablename__ = 'caliuser'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(120), unique=True)
     _password = db.Column(db.String(128))
@@ -65,6 +67,8 @@ class Room(db.Model):
     """
     Model for chat rooms
     """
+    __tablename__ = 'caliroom'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(120), unique=True)
 
@@ -76,11 +80,13 @@ class Message(db.Model):
     NOTE: using a UUID4 as primary key to avoid risks of running out of integers.
     A UUID4 has a risk of collition of 1/(2^64 * 16)
     """
+    __tablename__ = 'calimessage'
+
     uuid = db.Column(UUIDType, primary_key=True, default=uuid.uuid4)
     message = db.Column(db.Text)
     timestamp = db.Column(UTCAwareDateTime, index=True)
-    room_id = db.Column(db.Integer, db.ForeignKey('room.id', ondelete='CASCADE'), index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('caliroom.id', ondelete='CASCADE'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('caliuser.id'))
     user = relationship("User")
     message_type = db.Column(db.String(120))
 

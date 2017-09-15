@@ -19,6 +19,7 @@ class Config:
     SERVER_NAME = get_string('SERVER_NAME', 'calichat.local:5000')
     SQLALCHEMY_DATABASE_URI = get_string(
         'DATABASE_URL', 'sqlite:///{}'.format(os.path.join(BASE_DIR, 'calichat.db')))
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     CSRF_ENABLED = get_bool('CSRF_ENABLED', True)
     BCRYPT_LOG_ROUNDS = get_int('BCRYPT_LOG_ROUNDS', 12)
     SOCKET_NAMESPACE = '/chat'

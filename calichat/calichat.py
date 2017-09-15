@@ -173,6 +173,7 @@ def login_required_socket(f):
 class ChatNamespace(Namespace):
     """Socketio definitions"""
 
+    @login_required_socket
     def on_connect(self):
         """Handler for connection"""
         response_json, _ = create_system_message('You are connected, {}'.format(current_user.email))
@@ -181,6 +182,7 @@ class ChatNamespace(Namespace):
             response_json
         )
 
+    @login_required_socket
     def on_disconnect(self):
         """Handler for disconnection"""
         response_json, _ = create_system_message('Disconnected')
