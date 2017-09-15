@@ -59,9 +59,7 @@ Then you should be able to start the service with either
 ```
 flask run --host=0.0.0.0
 ```
-if you want the dev server
-
-or
+if you want the dev server or
 ```
 uwsgi uwsgi.ini
 ```
@@ -70,7 +68,7 @@ if you want a produnction like server.
 
 ### Use the chat
 Add an entry to your `/etc/hosts` to resolve `calichat.local` (or your local name) to the IP where the app is running.
-Note: if you run docker-machine, the IP is NOT 127.0.0.1
+Note: if you run docker-machine, the IP is NOT `127.0.0.1`
 
 The chat should then be available at http://calichat.local:5000/
 
