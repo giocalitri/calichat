@@ -18,7 +18,6 @@ services:
     environment:
       NODE_ENV: 'development'
       DATABASE_URL: postgres://postgres@db:5432/postgres
-      DOCKER_HOST: ${DOCKER_HOST:-missing}
       REDIS_URL: redis://redis:6379/0
       FLASK_APP: calichat/calichat.py
       FLASK_DEBUG: 1
