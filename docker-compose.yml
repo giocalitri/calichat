@@ -10,6 +10,20 @@ services:
     ports:
       - "6379"
 
+  nginx:
+    image: diatigrah/nginx
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/web.conf
+      - ./:/src
+    environment:
+      - NGINX_HOST=calichat.local
+      - NGINX_PORT=5000
+    ports:
+      - "5000:5000"
+    links:
+      - web1
+      - web2
+
   python:
     build: .
     command: /bin/true
@@ -23,23 +37,7 @@ services:
       FLASK_DEBUG: 1
     env_file: .env
 
-  web_1:
-    image: calichat_python
-    extends:
-      service: python
-    environment:
-      PORT: 5000
-    command: >
-      /bin/bash -c '
-      sleep 3 &&
-      uwsgi uwsgi.ini'
-    ports:
-      - "5000:5000"
-    links:
-      - db
-      - redis
-      
-  web_2:
+  web1:
     image: calichat_python
     extends:
       service: python
@@ -51,6 +49,22 @@ services:
       uwsgi uwsgi.ini'
     ports:
       - "5001:5001"
+    links:
+      - db
+      - redis
+      
+  web2:
+    image: calichat_python
+    extends:
+      service: python
+    environment:
+      PORT: 5002
+    command: >
+      /bin/bash -c '
+      sleep 3 &&
+      uwsgi uwsgi.ini'
+    ports:
+      - "5002:5002"
     links:
       - db
       - redis
