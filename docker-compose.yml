@@ -23,7 +23,7 @@ services:
       FLASK_DEBUG: 1
     env_file: .env
 
-  web_1:
+  web1:
     image: calichat_python
     extends:
       service: python
@@ -39,7 +39,7 @@ services:
       - db
       - redis
       
-  web_2:
+  web2:
     image: calichat_python
     extends:
       service: python

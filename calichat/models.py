@@ -45,7 +45,8 @@ class User(db.Model, UserMixin):
         """
         Password setter
         """
-        self._password = bcrypt.generate_password_hash(plaintext)
+        binary_password = bcrypt.generate_password_hash(plaintext)
+        self._password = binary_password.decode('utf-8')
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -60,7 +61,8 @@ class User(db.Model, UserMixin):
         """
         Checks if the password is correct
         """
-        return bcrypt.check_password_hash(self._password, plaintext)
+        binary_password = self._password.encode('utf-8')
+        return bcrypt.check_password_hash(binary_password, plaintext)
 
 
 class Room(db.Model):
