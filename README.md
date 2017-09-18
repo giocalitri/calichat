@@ -80,5 +80,5 @@ with multiple workers using a message queue.
 * Handle deletion of chat rooms and notify other users of the creations of new rooms
 * Put nginx in fron of the uwsgi processes with a load balancer configuration
 * Move all the JS and CSS outside the templates.
-* Unit tests and linting: I did not write any, but this should be priority #1 in a future iteration of the project
+* Unit tests and linting
 
