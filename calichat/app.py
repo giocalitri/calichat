@@ -6,9 +6,9 @@ from flask import Flask
 
 from calichat.config import Config
 from calichat.extensions import (
+    bcrypt,
     db,
     login_manager,
-    bcrypt,
 )
 from calichat.models import User
 
@@ -16,12 +16,16 @@ from calichat.models import User
 def create_app():
     """
     Function to create a flask app
+
+    Returns:
+        flask.app.Flask: flask app object
     """
     app = Flask(__name__)
     app.config.from_object(Config)
 
     # configure and initialize the database
     db.init_app(app)
+
     with app.test_request_context():
         # hack to automatically create all the tables
         db.create_all()

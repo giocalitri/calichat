@@ -8,6 +8,15 @@ import pytz
 def create_message_structure(content, sender, message_type):
     """
     Creates a message dictionary
+
+    Args:
+        content (str): a string representing a message
+        sender (str): a string representing the sender
+        message_type (str): a string representing the message type
+
+    Returns:
+        tuple: a tuple containing a dictionary of the infos about a chat message
+            and a datatime object
     """
     raw_timestamp = datetime.now(tz=pytz.UTC)
     message = {
@@ -23,6 +32,14 @@ def create_message_structure(content, sender, message_type):
 def create_user_message(content, sender):
     """
     Shortcut for create_message_structure user messages
+
+    Args:
+        content (str): a string representing a message
+        sender (str): a string representing the sender
+
+    Returns:
+        tuple: a tuple containing a dictionary of the infos about a chat message
+            and a datatime object
     """
     return create_message_structure(content, sender, message_type='user_message')
 
@@ -30,13 +47,26 @@ def create_user_message(content, sender):
 def create_system_message(content):
     """
     Shortcut for create_message_structure user messages
+
+    Args:
+        content (str): a string representing a message
+
+    Returns:
+        tuple: a tuple containing a dictionary of the infos about a chat message
+            and a datatime object
     """
     return create_message_structure(content, sender='system', message_type='notification')
 
 
 def serialize_pagination(pagination_obj):
     """
-    Returns a list of serialized objects for the elements in the iterable
+    Returns a dictionary of serialized sqalchemy pagination object.
+
+    Args:
+        pagination_obj (flask.ext.sqlalchemy.Pagination): a pagination object
+
+    Returns:
+        dict: the serialization of the pagination object
     """
     return {
         'items': [item.to_json() for item in pagination_obj.items],
