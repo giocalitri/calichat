@@ -81,4 +81,4 @@ with multiple workers using a message queue.
 * Put nginx in fron of the uwsgi processes with a load balancer configuration
 * Move all the JS and CSS outside the templates.
 * Unit tests and linting
-
+* Front end in REACT

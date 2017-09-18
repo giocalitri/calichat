@@ -1,4 +1,7 @@
-"""The actual app"""
+"""
+Module Containing the definition of the flask app
+"""
+# Monkey patching of the standard library needs to be done before any other import
 from gevent import monkey
 monkey.patch_all()
 

@@ -1,5 +1,5 @@
 """
-defines the base app and the configuration
+Module contining the funcion to create a flask app with the basic configuration
 """
 
 from flask import Flask

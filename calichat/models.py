@@ -2,7 +2,6 @@
 import uuid
 
 import pytz
-
 from flask_login import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
