@@ -149,7 +149,6 @@ def logout():
 def get_old_messages(room_id):
     """
     REST view to get the old messages.
-    Using this insead of websockets just as a demonstration.
     """
     Room.query.filter_by(id=room_id).first_or_404()
     try:
